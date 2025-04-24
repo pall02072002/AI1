@@ -1,0 +1,91 @@
+exp 5 tower of Hanoi
+
+class TowerOfHanoi:
+    def __init__(self, n):
+        self.n = n
+        # Initial state with all disks on Rod 1
+        self.rods = {
+            'Rod 1': list(range(n, 0, -1)), # Rod 1 has disks in descending order
+            'Rod 2': [],
+            'Rod 3': []
+        }
+
+    # Goal state is when all disks are moved to Rod 3
+    def goal_state(self):
+        return {
+            'Rod 1': [],
+            'Rod 2': [],
+            'Rod 3': list(range(self.n, 0, -1)) # All disks in descending order on Rod 3
+        }
+
+    # A disk can only be moved to a rod if it's smaller than the top disk on that rod
+    def legal_move(self, source, destination):
+        if not self.rods[source]:
+            return False # Can't move if the source rod is empty
+        if not self.rods[destination]:
+            return True # Always can move to an empty rod
+        return self.rods[source][-1] < self.rods[destination][-1]
+
+    # Perform a move from source to destination rod
+    def move_disk(self, source, destination):
+        if self.legal_move(source, destination):
+            disk = self.rods[source].pop() # Pop the top disk from the source rod
+            self.rods[destination].append(disk) # Push it to the destination rod
+            print(f"Move disk {disk} from {source} to {destination}")
+        else:
+            print(f"Illegal move: Can't move disk from {source} to {destination}")
+
+    # Solve the Tower of Hanoi problem recursively
+    def tower_of_hanoi(self, n, source, auxiliary, destination):
+        if n == 1:
+            # Base case: Only one disk to move
+            self.move_disk(source, destination)
+            return
+        # Move the top n-1 disks from source to auxiliary using destination as auxiliary
+        self.tower_of_hanoi(n-1, source, destination, auxiliary)
+        # Move the nth disk from source to destination
+        self.move_disk(source, destination)
+        # Move the n-1 disks from auxiliary to destination using source as auxiliary
+        self.tower_of_hanoi(n-1, auxiliary, source, destination)
+
+# Problem Formulation:
+n = 3 # Number of disks
+problem = TowerOfHanoi(n)
+
+# Step 1: Initial state
+print("Initial state:")
+print(problem.rods)
+
+# Step 2: Goal state
+print("\nGoal state:")
+print(problem.goal_state())
+
+# Step 3: Start solving the Tower of Hanoi problem
+print("\nSolution steps:")
+problem.tower_of_hanoi(n, 'Rod 1', 'Rod 2', 'Rod 3')
+
+# Step 4: Final state (after solution)
+print("\nFinal state:")
+print(problem.rods)
+
+
+
+//output
+
+Initial state:
+{'Rod 1': [3, 2, 1], 'Rod 2': [], 'Rod 3': []}
+
+Goal state:
+{'Rod 1': [], 'Rod 2': [], 'Rod 3': [3, 2, 1]}
+
+Solution steps:
+Move disk 1 from Rod 1 to Rod 3
+Move disk 2 from Rod 1 to Rod 2
+Move disk 1 from Rod 3 to Rod 2
+Move disk 3 from Rod 1 to Rod 3
+Move disk 1 from Rod 2 to Rod 1
+Move disk 2 from Rod 2 to Rod 3
+Move disk 1 from Rod 1 to Rod 3
+
+Final state:
+{'Rod 1': [], 'Rod 2': [], 'Rod 3': [3, 2, 1]}
