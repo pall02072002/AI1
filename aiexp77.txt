@@ -1,0 +1,112 @@
+exp 7 
+Experiment No.7
+Implement forward chaining reasoning for Medical
+Diagnosis System Using Prolog.
+
+
+
+
+% -------------------------------------
+% Medical Diagnosis Expert System
+% CSL604: Artificial Intelligence Lab
+% Vidyavardhini’s College of Engineering & Technology
+% Department of Computer Engineering
+% -------------------------------------
+
+% Declare the symptom predicate as dynamic so we can assert new facts
+:- dynamic symptom/1.
+
+% -------------------------------------
+% Disease-Symptom Associations
+% -------------------------------------
+has_symptom(flu, fever).
+has_symptom(flu, cough).
+has_symptom(flu, headache).
+has_symptom(flu, fatigue).
+
+has_symptom(cold, cough).
+has_symptom(cold, sore_throat).
+has_symptom(cold, fatigue).
+
+has_symptom(covid19, fever).
+has_symptom(covid19, cough).
+has_symptom(covid19, headache).
+has_symptom(covid19, sore_throat).
+has_symptom(covid19, fatigue).
+has_symptom(covid19, chills).
+has_symptom(covid19, nausea).
+
+% -------------------------------------
+% Facts about diseases
+% -------------------------------------
+disease(flu).
+disease(cold).
+disease(covid19).
+
+% -------------------------------------
+% Rules to determine the disease
+% -------------------------------------
+diagnosis(flu) :- 
+    symptom(fever), 
+    symptom(cough), 
+    symptom(headache), 
+    symptom(fatigue).
+
+diagnosis(cold) :- 
+    symptom(cough), 
+    symptom(sore_throat), 
+    symptom(fatigue).
+
+diagnosis(covid19) :- 
+    symptom(fever), 
+    symptom(cough), 
+    symptom(headache),
+    symptom(sore_throat), 
+    symptom(fatigue), 
+    symptom(chills), 
+    symptom(nausea).
+
+% -------------------------------------
+% Evaluate and display diagnosis
+% -------------------------------------
+evaluate_diagnosis :-
+    findall(Disease, diagnosis(Disease), Diseases),
+    ( Diseases = [] ->
+        write('No diagnosis could be made based on the symptoms.'), nl
+    ; 
+        write('Possible diagnoses: '), nl,
+        display_diagnoses(Diseases)
+    ).
+
+% Display all matching diagnoses
+display_diagnoses([]).
+display_diagnoses([Disease | Rest]) :-
+    write('- '), write(Disease), nl,
+    display_diagnoses(Rest).
+
+% -------------------------------------
+% Ask user for symptoms
+% -------------------------------------
+ask_symptoms :-
+    write('Do you have fever? (yes/no): '), read(Ans1), handle_answer(fever, Ans1),
+    write('Do you have cough? (yes/no): '), read(Ans2), handle_answer(cough, Ans2),
+    write('Do you have headache? (yes/no): '), read(Ans3), handle_answer(headache, Ans3),
+    write('Do you have fatigue? (yes/no): '), read(Ans4), handle_answer(fatigue, Ans4),
+    write('Do you have sore throat? (yes/no): '), read(Ans5), handle_answer(sore_throat, Ans5),
+    write('Do you have shortness of breath? (yes/no): '), read(Ans6), handle_answer(shortness_of_breath, Ans6),
+    write('Do you have chills? (yes/no): '), read(Ans7), handle_answer(chills, Ans7),
+    write('Do you have nausea? (yes/no): '), read(Ans8), handle_answer(nausea, Ans8).
+
+% -------------------------------------
+% Handle user input and assert symptoms
+% -------------------------------------
+handle_answer(Symptom, yes) :-
+    assertz(symptom(Symptom)).
+handle_answer(_, no).
+
+% -------------------------------------
+% Start the diagnosis process
+% -------------------------------------
+start :-
+    ask_symptoms,
+    evaluate_diagnosis.
