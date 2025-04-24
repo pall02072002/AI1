@@ -1,0 +1,74 @@
+exp 8
+
+Implement Bayesian reasoning for probabilistic inference for
+Weather prediction
+
+
+
+
+% Prior Probabilities (These should sum to 1.0)
+prior(sunny, 0.6).
+prior(rainy, 0.3).
+prior(cloudy, 0.1).
+
+% Conditional Probabilities: P(Evidence | Weather)
+% Clouds
+conditional(clouds, sunny, 0.2).
+conditional(clouds, rainy, 0.8).
+conditional(clouds, cloudy, 0.7).
+
+% Humidity
+conditional(humidity, sunny, 0.1).
+conditional(humidity, rainy, 0.9).
+conditional(humidity, cloudy, 0.6).
+
+% P(Evidence): Marginal probability of an individual evidence
+evidence(Evidence, Prob) :-
+    findall(P, (
+        prior(Weather, Prior),
+        conditional(Evidence, Weather, Cond),
+        P is Prior * Cond
+    ), ProbList),
+    sum_list(ProbList, Prob).
+
+% P(Evidence1, Evidence2): Joint marginal probability of combined evidence
+evidence([E1, E2], Prob) :-
+    findall(P, (
+        prior(Weather, Prior),
+        conditional(E1, Weather, C1),
+        conditional(E2, Weather, C2),
+        P is Prior * C1 * C2
+    ), ProbList),
+    sum_list(ProbList, Prob).
+
+% P(Weather | Evidence): Posterior with single evidence
+posterior(Weather, Evidence, Prob) :-
+    prior(Weather, Prior),
+    conditional(Evidence, Weather, Cond),
+    evidence(Evidence, EvidenceProb),
+    Prob is (Prior * Cond) / EvidenceProb.
+
+% P(Weather | Evidence1, Evidence2): Posterior with multiple evidence
+combined_posterior(Weather, [E1, E2], Prob) :-
+    prior(Weather, Prior),
+    conditional(E1, Weather, C1),
+    conditional(E2, Weather, C2),
+    evidence([E1, E2], EvidenceProb),
+    Prob is (Prior * C1 * C2) / EvidenceProb.
+
+
+
+
+
+
+
+?- combined_posterior(sunny, [clouds, humidity], P).
+P = 0.027.
+?- combined_posterior(Weather, [clouds, humidity], P).
+Weather = sunny,
+P = 0.027 ;
+Weather = rainy,
+P = 0.871 ;
+Weather = cloudy,
+P = 0.102.
+

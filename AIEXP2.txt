@@ -1,0 +1,183 @@
+exp 2
+
+expImplement packet routing in a computer network using DFS
+and BFS.
+
+DFS
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+// DFS function to visit nodes
+void dfs(int node, vector<int> adj[], int visited[], vector<int> &ls) {
+    // Mark the node as visited
+    visited[node] = 1;
+    // Add node to the list
+    ls.push_back(node);
+    // Visit all adjacent nodes
+    for (auto it : adj[node]) {
+        if (!visited[it]) {
+            dfs(it, adj, visited, ls); // Recurse for unvisited node
+        }
+    }
+}
+
+// Function to perform DFS starting from node 0
+vector<int> visiting_array(vector<int> adj[], int nodes) {
+    // Declare the visited array to mark visited nodes
+    int visited[nodes] = {0};
+    // List to store the result of DFS
+    vector<int> ls;
+    // Call DFS starting from node 0
+    dfs(0, adj, visited, ls);
+    return ls;
+}
+
+// Function to add an edge to the undirected graph
+void addEdge(vector<int> adj[], int node, int adjacent) {
+    adj[node].push_back(adjacent);
+    adj[adjacent].push_back(node);
+}
+
+int main() {
+    int nodes, edges;
+    // Taking user input for number of nodes and edges
+    cout << "Enter the number of nodes: ";
+    cin >> nodes;
+    
+    cout << "Enter the number of edges: ";
+    cin >> edges;
+
+    vector<int> adj[nodes];
+
+    // Taking input for edges
+    cout << "Enter the edges (pair of nodes):\n";
+    for (int i = 0; i < edges; i++) {
+        int u, v;
+        cin >> u >> v;
+        addEdge(adj, u, v);
+    }
+
+    // Perform DFS starting from node 0
+    vector<int> ans = visiting_array(adj, nodes);
+
+    // Print the DFS result
+    cout << "DFS Traversal result: ";
+    for (auto it : ans) {
+        cout << it << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
+  //output
+
+Enter the number of nodes: 06
+Enter the number of edges: 4
+Enter the edges (pair of nodes):
+0 1
+1 2
+1 3
+0 4
+DFS Traversal result: 0 1 2 3 4 
+
+
+
+
+
+
+BFS
+
+
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+// BFS function
+vector<int> bfs(vector<int> adj[], int nodes) {
+    // initialize visited array
+    int visited[nodes] = {0};
+    visited[0] = 1;
+    
+    // declare queue
+    queue<int> qu;
+    qu.push(0);
+    
+    // initialize bfs result vector
+    vector<int> bfs;
+    
+    while (!qu.empty()) {
+        int node = qu.front();
+        qu.pop();
+        bfs.push_back(node);
+        
+        // point to the node and check for all adjacent nodes
+        for (auto it : adj[node]) {
+            if (!visited[it]) {
+                // if the node in adjacency list is not visited, mark it and push into queue
+                visited[it] = 1;
+                qu.push(it);
+            }
+        }
+    }
+    
+    return bfs;
+}
+
+// Function to add edge to the graph
+void addEdge(vector<int> adj[], int node, int adjacent) {
+    adj[node].push_back(adjacent);
+    adj[adjacent].push_back(node);
+}
+
+int main() {
+    int nodes, edges;
+    
+    // Taking user input for number of nodes and edges
+    cout << "Enter the number of nodes: ";
+    cin >> nodes;
+    
+    cout << "Enter the number of edges: ";
+    cin >> edges;
+
+    vector<int> adj[nodes];
+
+    // Taking input for edges
+    cout << "Enter the edges (pair of nodes):\n";
+    for (int i = 0; i < edges; i++) {
+        int u, v;
+        cin >> u >> v;
+        addEdge(adj, u, v);
+    }
+
+    // Perform BFS starting from node 0
+    vector<int> ans = bfs(adj, nodes);
+
+    // Print BFS result
+    cout << "BFS Traversal result: ";
+    for (auto it : ans) {
+        cout << it << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
+
+
+
+//OUTPUT
+
+
+Enter the number of nodes: 6
+Enter the number of edges: 4
+Enter the edges (pair of nodes):
+0 1
+1 2
+1 3
+0 4
+
+
+BFS Traversal result: 0 1 4 2 3
+
