@@ -1,0 +1,81 @@
+Experiment No.8
+Implement Bayesian reasoning for probabilistic inference for
+Weather prediction.
+
+
+% Prior Probabilities (These should sum to 1.0)
+prior(sunny, 0.6).
+prior(rainy, 0.3).
+prior(cloudy, 0.1).
+
+% Conditional Probabilities (Evidence: clouds, humidity)
+% P(Evidence | Weather)
+% Clouds
+conditional(clouds, sunny, 0.2).
+conditional(clouds, rainy, 0.8).
+conditional(clouds, cloudy, 0.7).
+
+% Humidity
+conditional(humidity, sunny, 0.1).
+conditional(humidity, rainy, 0.9).
+conditional(humidity, cloudy, 0.6).
+
+% Helper: Compute likelihood of evidence list for a given Weather
+evidence_likelihood([], _, 1).
+evidence_likelihood([E|Rest], Weather, Likelihood) :-
+    conditional(E, Weather, Cond),
+    evidence_likelihood(Rest, Weather, RestLikelihood),
+    Likelihood is Cond * RestLikelihood.
+
+% Compute P(Evidence)
+evidence(EvidenceList, Prob) :-
+    findall(P_weather, (
+        prior(Weather, Prior),
+        evidence_likelihood(EvidenceList, Weather, Likelihood),
+        P_weather is Prior * Likelihood
+    ), Probabilities),
+    sum_list(Probabilities, Prob).
+
+% Posterior Probability (P(Weather | Evidence))
+posterior(Weather, Evidence, Prob) :-
+    prior(Weather, Prior),
+    conditional(Evidence, Weather, Cond),
+    evidence([Evidence], EvidenceProb),
+    ( EvidenceProb =:= 0 ->
+        Prob = 0
+    ; Prob is (Prior * Cond) / EvidenceProb
+    ).
+
+% Combined Posterior Probability (for multiple evidence)
+combined_posterior(Weather, EvidenceList, Prob) :-
+    prior(Weather, Prior),
+    evidence_likelihood(EvidenceList, Weather, Likelihood),
+    evidence(EvidenceList, EvidenceProb),
+    ( EvidenceProb =:= 0 ->
+        Prob = 0
+    ; Prob is (Prior * Likelihood) / EvidenceProb
+    ).
+
+% -----------------------------
+% Sample Queries:
+%
+% 1. What is the probability of rain given clouds?
+% ?- posterior(rainy, clouds, P).
+%
+% 2. What is the probability of sunny given humidity?
+% ?- posterior(sunny, humidity, P).
+%
+% 3. What is the probability of cloudy given clouds and humidity?
+% ?- combined_posterior(cloudy, [clouds, humidity], P).
+%
+% 4. What is the probability of evidence clouds?
+% ?- evidence([clouds], P).
+%
+% 5. What is the probability of evidence humidity?
+% ?- evidence([humidity], P).
+%
+% 6. What is the probability of evidence clouds and humidity?
+% ?- evidence([clouds, humidity], P).
+%
+% 7. What is the probability of sunny given clouds and humidity?
+% ?- combined_posterior(sunny, [clouds, humidity], P).
